@@ -6,10 +6,10 @@ from setuptools import setup
 
 setup(
     name='Flask-Permissions',
-    version='0.2.3',
-    url='https://github.com/raddevon/flask-permissions',
+    version='1.0.0',
+    url='https://github.com/LouisTrezzini/flask-permissions',
     license='MIT',
-    author='Devon Campbell',
+    author='Louis Trezzini',
     author_email='devon@raddevon.com',
     description='Simple user permissions for Flask',
     long_description=__doc__,

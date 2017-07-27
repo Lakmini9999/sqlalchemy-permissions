@@ -27,14 +27,9 @@ class Permissions:
         def wrapper(func):
             @wraps(func)
             def inner(*args, **kwargs):
-                user_abilities = set()
                 current_user = self.get_user()
 
-                if current_user:
-                    for role in current_user.roles:
-                        user_abilities.update(role.abilities)
-
-                if desired_ability in user_abilities:
+                if current_user and current_user.has_ability(desired_ability):
                     return func(*args, **kwargs)
                 else:
                     raise Forbidden()
@@ -45,7 +40,8 @@ class Permissions:
 
     def user_is(self, role):
         """
-        Takes an role (a string name of either a role or an ability) and returns the function if the user has that role
+        Take a role and returns the function if the user has that role
+        Raise a Forbidden exception otherwise
         """
 
         def wrapper(func):
@@ -53,10 +49,16 @@ class Permissions:
             def inner(*args, **kwargs):
                 desired_role = self.__role_class.query.filter_by(name=role).first()
                 current_user = self.get_user()
-                if current_user and desired_role in current_user.roles:
+                if current_user and current_user.has_role(desired_role):
                     return func(*args, **kwargs)
                 raise Forbidden()
 
             return inner
 
         return wrapper
+
+    def trust_user_has(self, desired_ability):
+        current_user = self.get_user()
+
+        if not (current_user and current_user.has_ability(desired_ability)):
+            raise Forbidden()
