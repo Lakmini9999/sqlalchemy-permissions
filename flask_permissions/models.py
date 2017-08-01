@@ -37,7 +37,7 @@ class RoleMixin(AbilitiesMixin):
     Subclass this for your roles
     """
     id = Column(Integer, primary_key=True)
-    name = Column(String(120), unique=True)
+    name = Column(String(120), unique=True, nullable=False)
 
     def __init__(self, name=None):
         if name:
@@ -57,8 +57,8 @@ class UserMixin(AbilitiesMixin):
             "%s_roles" % self.__tablename__,
             self.metadata,
             Column("id", Integer, primary_key=True),
-            Column("%s_id" % self.__tablename__, Integer, ForeignKey("%s.id" % self.__tablename__)),
-            Column("role_id", Integer, ForeignKey("roles.id")),
+            Column("%s_id" % self.__tablename__, Integer, ForeignKey("%s.id" % self.__tablename__), nullable=False),
+            Column("role_id", Integer, ForeignKey("roles.id"), nullable=False),
             UniqueConstraint("%s_id" % self.__tablename__, "role_id"),
         )
         return relationship("Role", secondary=users_roles_table, backref="users")
