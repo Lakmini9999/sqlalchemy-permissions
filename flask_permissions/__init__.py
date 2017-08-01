@@ -57,8 +57,19 @@ class Permissions:
 
         return wrapper
 
-    def trust_user_has(self, desired_ability):
+    def trust_ability_or_user(self, desired_ability, desired_user):
         current_user = self.get_user()
 
-        if not (current_user and current_user.has_ability(desired_ability)):
-            raise Forbidden()
+        if current_user:
+            if current_user.has_ability(desired_ability):
+                return
+
+            if desired_user:
+                ability_prefix, ability_suffix = desired_ability.split(".", 1)
+                if ability_suffix.isdecimal():
+                    self_ability = ability_prefix + ".self"
+
+                    if current_user.id == desired_user.id and current_user.has_ability(self_ability):
+                        return
+
+        raise Forbidden()
