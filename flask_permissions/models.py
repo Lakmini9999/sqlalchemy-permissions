@@ -4,7 +4,11 @@ from sqlalchemy.ext.declarative import declared_attr
 
 
 class AbilitiesMixin:
-    abilities_text = Column(Text(), default="")
+    abilities_text = Column(Text())
+
+    def __init__(self):
+        super().__init__()
+        self.abilities_text = ""
 
     @property
     def abilities(self):
@@ -12,13 +16,13 @@ class AbilitiesMixin:
 
     @abilities.setter
     def abilities(self, new_abilities):
-        self.abilities_text = "\n".join(new_abilities)
+        self.abilities_text = "\n".join(set(new_abilities))
 
     def add_abilities(self, new_abilities):
-        self.abilities = self.abilities.update(new_abilities)
+        self.abilities.update(new_abilities)
 
     def remove_abilities(self, old_abilities):
-        self.abilities = self.abilities.difference_update(old_abilities)
+        self.abilities.difference_update(old_abilities)
 
     def has_ability(self, ability):
         if ability in self.abilities:
@@ -40,6 +44,7 @@ class RoleMixin(AbilitiesMixin):
     name = Column(String(120), unique=True, nullable=False)
 
     def __init__(self, name=None):
+        super().__init__()
         if name:
             self.name = name.lower()
 
@@ -54,16 +59,17 @@ class UserMixin(AbilitiesMixin):
     @declared_attr
     def roles(self):
         users_roles_table = Table(
-            "%s_roles" % self.__tablename__,
+            "user_roles",
             self.metadata,
             Column("id", Integer, primary_key=True),
-            Column("%s_id" % self.__tablename__, Integer, ForeignKey("%s.id" % self.__tablename__), nullable=False),
-            Column("role_id", Integer, ForeignKey("roles.id"), nullable=False),
-            UniqueConstraint("%s_id" % self.__tablename__, "role_id"),
+            Column("user_id", Integer, ForeignKey("%s.id" % self.__tablename__), nullable=False),
+            Column("role_id", Integer, ForeignKey("%s.id" % self.__roleclass__.__tablename__), nullable=False),
+            UniqueConstraint("user_id", "role_id"),
         )
         return relationship("Role", secondary=users_roles_table, backref="users")
 
     def __init__(self, roles=None):
+        super().__init__()
         # If only a string is passed for roles, convert it to a list containing
         # that string
         if roles and isinstance(roles, RoleMixin):
