@@ -1,14 +1,15 @@
-# Flask-Permissions
+# SQLAlchemy-Permissions
 
-[![Build Status](https://travis-ci.org/raddevon/flask-permissions.png?branch=master)](https://travis-ci.org/raddevon/flask-permissions)
+[![Build Status](https://travis-ci.org/louistrezzini/sqlalchemy-permissions.png?branch=master)](https://travis-ci.org/louistrezzini/sqlalchemy-permissions)
 
-Flask-Permissions is a simple Flask permissions extension that works with [Flask-SQLAlchemy](https://github.com/mitsuhiko/flask-sqlalchemy). It also plays nicely with [Flask-Login](https://github.com/maxcountryman/flask-login) although that isn't a strict requirement.
+SQLAlchemy-Permissions is a simple Flask permissions extension that works with [Flask-SQLAlchemy](https://github.com/mitsuhiko/flask-sqlalchemy).
+It also plays nicely with [Flask-SQLAlchemy](https://github.com/mitsuhiko/flask-sqlalchemy) and [Flask-Login](https://github.com/maxcountryman/flask-login) although they're not a requirement.
 
 ## Installation
 
 Installs quickly and easily using PIP:
 
-    pip install Flask-Permissions
+    pip install SQLAlchemy-Permissions
 
 ## Getting Started
 

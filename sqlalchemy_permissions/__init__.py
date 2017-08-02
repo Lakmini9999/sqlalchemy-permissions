@@ -29,10 +29,16 @@ class Permissions:
             def inner(*args, **kwargs):
                 current_user = self.get_user()
 
-                if current_user and current_user.has_ability(desired_ability):
-                    return func(*args, **kwargs)
-                else:
-                    raise Forbidden()
+                ability_prefix, ability_suffix = desired_ability.rsplit(".", 1)
+                if current_user:
+                    print(current_user.abilities, ability_suffix, ability_prefix)
+                    if current_user.has_ability(desired_ability):
+                        return func(*args, **kwargs)
+
+                    if ability_suffix.isdecimal() and current_user.id == int(ability_suffix) and current_user.has_ability(ability_prefix + ".self"):
+                        return func(*args, **kwargs)
+
+                raise Forbidden()
 
             return inner
 
@@ -57,19 +63,5 @@ class Permissions:
 
         return wrapper
 
-    def trust_ability_or_user(self, desired_ability, desired_user):
-        current_user = self.get_user()
-
-        if current_user:
-            if current_user.has_ability(desired_ability):
-                return
-
-            if desired_user:
-                ability_prefix, ability_suffix = desired_ability.split(".", 1)
-                if ability_suffix.isdecimal():
-                    self_ability = ability_prefix + ".self"
-
-                    if current_user.id == desired_user.id and current_user.has_ability(self_ability):
-                        return
-
-        raise Forbidden()
+    def check_user_has(self, desired_ability):
+        return self.user_has(desired_ability)(lambda: True)

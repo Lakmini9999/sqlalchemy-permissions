@@ -29,7 +29,7 @@ class AbilitiesMixin:
             return True
 
         while "." in ability:
-            ability, ability_suffix = ability.split(".", 1)
+            ability, ability_suffix = ability.rsplit(".", 1)
             if ability in self.abilities:
                 return True
 
@@ -101,7 +101,7 @@ class UserMixin(AbilitiesMixin):
     def has_role(self, role):
         return role in self.roles
 
-    @property
+    @AbilitiesMixin.abilities.getter
     def abilities(self):
         user_abilities = super().abilities
 
