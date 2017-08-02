@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/louistrezzini/sqlalchemy-permissions.png?branch=master)](https://travis-ci.org/louistrezzini/sqlalchemy-permissions)
 
-SQLAlchemy-Permissions is a simple Flask permissions extension that works with [Flask-SQLAlchemy](https://github.com/mitsuhiko/flask-sqlalchemy).
+SQLAlchemy-Permissions is a simple Flask permissions extension that works with [SQLAlchemy](https://github.com/zzzeek/sqlalchemy).
 It also plays nicely with [Flask-SQLAlchemy](https://github.com/mitsuhiko/flask-sqlalchemy) and [Flask-Login](https://github.com/maxcountryman/flask-login) although they're not a requirement.
 
 ## Installation
@@ -21,32 +21,44 @@ Installs quickly and easily using PIP:
 
 2. Import the `Permissions` object.
 
-        from flask.ext.permissions.core import Permissions
+        from sqlalchemy_permissions import Permissions
 
-3. Instantiate the `Permissions` object passing in your Flask app, SQLAlchemy database, and a proxy for the current user.
+3. Instantiate the `Permissions` object passing in your User and Role classes, and a proxy for the current user.
 
-        perms = Permissions(app, db, current_user)
+        perms = Permissions(User, Role, current_user)
 
-4. Sub-class the Flask-Permissions UserMixin. Call the UserMixin's `__init__` in your own `__init__`.
+4. Sub-class the SQLAlchemy-Permissions UserMixin and RoleMixin. Call the Mixins' `__init__` in your own `__init__`.
 
         from app import db
-        from flask.ext.permissions.models import UserMixin
+        from sqlalchemy_permissions.models import UserMixin, RoleMixin
 
 
-        class User(UserMixin):
+        class Role(RoleMixin, db.Model):
+            id = Column(Integer, primary_key=True)
+            # Add whatever fields you need for your user class here.
+
+            def __init__(self, ...):
+                # Do your user init
+                RoleMixin.__init__(self, roles)
+
+
+        class User(UserMixin, db.Model):
+            __roleclass__ = Role
+
+            id = Column(Integer, primary_key=True)
             # Add whatever fields you need for your user class here.
 
             def __init__(self, ...):
                 # Do your user init
                 UserMixin.__init__(self, roles)
 
-5. Add roles to your users and abilities to your roles. This can be done using convenience methods on the `UserMixin` and `Role` classes.
+5. Add roles to your users and abilities to your roles. This can be done using convenience methods on the `UserMixin` and `RoleMixin` classes.
 
     You'll need a role to start adding abilities.
 
         my_role = Role('admin')
 
-    Add abilities by passing string ability names to `role.add_abilities()`. You may pass existing or new abilities in this way. New abilities will be created for you. Add the role to the session and commit when you're done.
+    Add abilities by passing string ability names to `role.add_abilities()`. Add the role to the session and commit when you're done.
 
         my_role.add_abilities('create_users', 'delete_users', 'bring_about_world_peace')
         db.session.add(my_role)
@@ -56,35 +68,33 @@ Installs quickly and easily using PIP:
 
         my_user = User()
 
-    The `user.add_roles()` method works just like `role.add_abilities()`. Pass in a string name or a series of string names. New roles will be created for you. Existing roles will simply be applied to the user. Don't forget to add and commit to the database!
+    The `user.add_roles()` expects Role objects that will be assigned to the user. Don't forget to add and commit to the database!
 
-        my_user.add_roles('admin', 'superadmin')
+        my_user.add_roles([my_role])
         db.session.add(my_user)
         db.session.commit()
 
-    Similarly to the add methods, the classes also offer remove methods that work in the same way. Pass strings to `role.remove_abilities()` or `user.remove_roles()` to remove those attributes from the objects in question.
+    Similarly to the add methods, the classes also offer remove methods that work in the same way. Pass strings to `role.remove_abilities()` or roles to `user.remove_roles()` to remove those attributes from the objects in question.
 
-6. Put those decorators to work! Decorate any of your views with the `user_is` or `user_has` decorators from `flask.ext.permissions.decorators` to limit access.
-
-        from flask.ext.permissions.decorators import user_is, user_has
+6. Put those decorators to work! Decorate any of your views with the `user_is` or `user_has` decorators from the `Permissions` instance to limit access.
 
     `@user_is` decorator:
 
         @app.route('/admin', methods=['GET', 'POST'])
-        @user_is('admin')
+        @perms.user_is('admin')
         def admin():
             return render_template('admin.html')
 
     `@user_has` decorator:
 
         @app.route('/delete-users', methods=['GET', 'POST'])
-        @user_has('delete_users')
+        @perms.user_has('delete_users')
         def delete_users():
             return render_template('delete-users.html')
 
 ## Example Implementation
 
-This is ripped almost directly from a project I'm working on that implements Flask-Permissions. Be sure to check out the code comments for help with what does what.
+This is ripped almost directly from a project I'm working on that implements SQLAlchemy-Permissions. Be sure to check out the code comments for help with what does what.
 
 #### \__init__.py
 
@@ -172,6 +182,7 @@ This extension is available under the MIT license. See the LICENSE file for more
 
 ## Thank You
 
-I hope you enjoy this project. I built Flask-Permissions because I couldn't find a simple permissions system for Flask. This does everything I need, and I feel the implementation is very easy to understand.
+I hope you will enjoy this project. I built SQLAlchemy-Permissions because I couldn't find a simple yet flexible permissions system for Flask and SQLAlchemy.
+This does everything I need and implements ACL, yet the implementation is very easy to understand.
 
-I'd love to hear your comments either on Twitter ([@raddevon](http://twitter.com/raddevon/)) or via email ([devon@raddevon.com](mailto:devon@raddevon.com)). I welcome pull requests, but I'm just one guy (and still a relatively new coder) so please try to be patient with me. If this project helps you, consider leaving me a [gittip](https://www.gittip.com/raddevon/).
+This is my first open source library. Pull requests and comments are welcome and appreciated!
