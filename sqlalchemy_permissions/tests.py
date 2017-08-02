@@ -245,10 +245,10 @@ class PermissionsTests(DatabaseTests):
         self.assertRaises(Forbidden, wrapped_function)
 
     def test_user_has_self(self):
-        wrapped_function = perms.user_has("user.update.7")(self.mock_function)
+        wrapped_function = perms.user_has("user.update.7", 7)(self.mock_function)
         self.assertRaises(Forbidden, wrapped_function)
 
-        wrapped_function = perms.user_has("user.update.1")(self.mock_function)
+        wrapped_function = perms.user_has("user.update.1", 1)(self.mock_function)
         self.assertTrue(wrapped_function())
 
     def test_user_is_pass(self):

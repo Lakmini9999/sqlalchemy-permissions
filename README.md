@@ -5,6 +5,16 @@
 SQLAlchemy-Permissions is a simple Flask permissions extension that works with [SQLAlchemy](https://github.com/zzzeek/sqlalchemy).
 It also plays nicely with [Flask-SQLAlchemy](https://github.com/mitsuhiko/flask-sqlalchemy) and [Flask-Login](https://github.com/maxcountryman/flask-login) although they're not a requirement.
 
+## Features
+
+- User and Role mixins, which can both be assigned abilities
+- **Tree-based ability checking** If you ask for ability `entity.update.37`, this will happen
+    1. Merge User and User's roles abilities
+    2. If the user has `entity.update.37`, OK
+    3. If the user has a parent ability, e.g. `entity.update` or `entity`, OK
+    4. It the user has the `entity.update.self` and is the owner of the entity, OK
+    5. Otherwise raises a Forbidden exception
+
 ## Installation
 
 Installs quickly and easily using PIP:

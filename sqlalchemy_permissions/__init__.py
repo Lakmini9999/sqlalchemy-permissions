@@ -19,7 +19,7 @@ class Permissions(object):
             except ImportError:
                 raise ImportError("User argument not passed and Flask-Login current_user could not be imported.")
 
-    def user_has(self, desired_ability):
+    def user_has(self, desired_ability, owner_id=None):
         """
         Takes an ability (a string name of either a role or an ability) and returns the function if the user has that ability
         """
@@ -29,17 +29,17 @@ class Permissions(object):
             def inner(*args, **kwargs):
                 current_user = self.get_user()
 
-                ability_prefix, ability_suffix = desired_ability.rsplit(".", 1)
                 if current_user:
                     if current_user.has_ability(desired_ability):
                         return func(*args, **kwargs)
 
+                    ability_prefix, ability_suffix = desired_ability.rsplit(".", 1)
                     try:
-                        desired_user_id = int(ability_suffix)
+                        object_id = int(ability_suffix)
                     except ValueError:
                         pass
                     else:
-                        if current_user.id == desired_user_id and current_user.has_ability(ability_prefix + ".self"):
+                        if object_id and current_user.id == owner_id and current_user.has_ability(ability_prefix + ".self"):
                             return func(*args, **kwargs)
 
                 raise Forbidden()
@@ -67,5 +67,5 @@ class Permissions(object):
 
         return wrapper
 
-    def check_user_has(self, desired_ability):
-        return self.user_has(desired_ability)(lambda: True)
+    def check_user_has(self, desired_ability, owner_id):
+        return self.user_has(desired_ability, owner_id)(lambda: True)
