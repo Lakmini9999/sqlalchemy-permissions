@@ -67,5 +67,5 @@ class Permissions(object):
 
         return wrapper
 
-    def check_user_has(self, desired_ability, owner_id):
+    def check_user_has(self, desired_ability, owner_id=None):
         return self.user_has(desired_ability, owner_id)(lambda: True)
