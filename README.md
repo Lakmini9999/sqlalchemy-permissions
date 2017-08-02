@@ -83,13 +83,17 @@ db.session.commit()
 
 Add roles on an instance of your `UserMixin` sub-class.
 
-    my_user = User()
+```python
+my_user = User()
+```
 
 The `user.add_roles()` expects Role objects that will be assigned to the user. Don't forget to add and commit to the database!
 
-    my_user.add_roles([my_role])
-    db.session.add(my_user)
-    db.session.commit()
+```python
+my_user.add_roles([my_role])
+db.session.add(my_user)
+db.session.commit()
+```
 
 Similarly to the add methods, the classes also offer remove methods that work in the same way. Pass strings to `role.remove_abilities()` or roles to `user.remove_roles()` to remove those attributes from the objects in question.
 
@@ -97,17 +101,21 @@ Similarly to the add methods, the classes also offer remove methods that work in
 
 `@user_is` decorator:
 
-    @app.route('/admin', methods=['GET', 'POST'])
-    @perms.user_is('admin')
-    def admin():
-        return render_template('admin.html')
+```python
+@app.route("/admin", methods=["GET", "POST"])
+@perms.user_is("admin")
+def admin():
+    return render_template("admin.html")
+```
 
 `@user_has` decorator:
 
-    @app.route('/delete-users', methods=['GET', 'POST'])
-    @perms.user_has('delete_users')
-    def delete_users():
-        return render_template('delete-users.html')
+```python
+@app.route("/delete-users", methods=["GET", "POST"])
+@perms.user_has("delete_users")
+def delete_users():
+    return render_template("delete-users.html")
+```
 
 ## Example Implementation
 
@@ -115,35 +123,38 @@ This is ripped almost directly from a project I'm working on that implements SQL
 
 #### \__init__.py
 
-    # Import Flask, Flask-SQLAlchemy, and maybe Flask-Login
-    from flask import Flask
-    from flask.ext.login import LoginManager, current_user
-    from flask.ext.sqlalchemy import SQLAlchemy
+```python
+# Import Flask, Flask-SQLAlchemy, and maybe Flask-Login
+from flask import Flask
+from flask.ext.login import LoginManager, current_user
+from flask.ext.sqlalchemy import SQLAlchemy
 
-    # Import the Permissions object
-    from flask.ext.permissions.core import Permissions
+# Import the Permissions object
+from flask.ext.permissions.core import Permissions
 
-    # Here, you'll initialize your app with Flask and your database with
-    # Flask-SQLAlchemy. It might look something like this:
-    db = SQLAlchemy()
+# Here, you'll initialize your app with Flask and your database with
+# Flask-SQLAlchemy. It might look something like this:
+db = SQLAlchemy()
 
-    app = Flask(__name__)
-    app.config.from_object('config')
+app = Flask(__name__)
+app.config.from_object('config')
 
-    db.init_app(app)
-    with app.test_request_context():
-        db.create_all()
+db.init_app(app)
+with app.test_request_context():
+    db.create_all()
 
-    # If you're using Flask-Login, this would be a good time to set that up.
-    login_manager = LoginManager()
-    login_manager.init_app(app)
+# If you're using Flask-Login, this would be a good time to set that up.
+login_manager = LoginManager()
+login_manager.init_app(app)
 
-    # Now, initialize a Permissions object. I've assigned it to a variable here,
-    # but you don't have to do so.
-    perms = Permissions(app, db, current_user)
+# Now, initialize a Permissions object. I've assigned it to a variable here,
+# but you don't have to do so.
+perms = Permissions(app, db, current_user)
+```
 
 #### models.py
 
+```python
     # Import your database
     from app import db
     # I'm using these handy functions for my user's password. Flask is dependent
@@ -173,25 +184,28 @@ This is ripped almost directly from a project I'm working on that implements SQL
 
         def __str__(self):
             return self.email
+```
 
 #### views.py
 
-    # Import the decorators
-    from flask.ext.permissions.decorators import user_is, user_has
+```python
+# Import the decorators
+from flask.ext.permissions.decorators import user_is, user_has
 
-    # Set up your route and decorate it
-    @app.route('/admin', methods=['GET', 'POST'])
-    # Pass the name of the role you want to test for to the decorator
-    @user_is('admin')
-    def admin():
-        return render_template('admin.html')
+# Set up your route and decorate it
+@app.route('/admin', methods=['GET', 'POST'])
+# Pass the name of the role you want to test for to the decorator
+@user_is('admin')
+def admin():
+    return render_template('admin.html')
 
-    # Here's an example of user_has
-    @app.route('/delete-users', methods=['GET', 'POST'])
-    # Pass the name of the ability you want to test for to the decorator
-    @user_has('delete_users')
-    def delete_users():
-        return render_template('delete-users.html')
+# Here's an example of user_has
+@app.route('/delete-users', methods=['GET', 'POST'])
+# Pass the name of the ability you want to test for to the decorator
+@user_has('delete_users')
+def delete_users():
+    return render_template('delete-users.html')
+```
 
 ## License
 
