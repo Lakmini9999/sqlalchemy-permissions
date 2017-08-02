@@ -34,8 +34,13 @@ class Permissions(object):
                     if current_user.has_ability(desired_ability):
                         return func(*args, **kwargs)
 
-                    if ability_suffix.isdecimal() and current_user.id == int(ability_suffix) and current_user.has_ability(ability_prefix + ".self"):
-                        return func(*args, **kwargs)
+                    try:
+                        desired_user_id = int(ability_suffix)
+                    except ValueError:
+                        pass
+                    else:
+                        if current_user.id == desired_user_id and current_user.has_ability(ability_prefix + ".self"):
+                            return func(*args, **kwargs)
 
                 raise Forbidden()
 
