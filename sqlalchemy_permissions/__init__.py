@@ -31,7 +31,6 @@ class Permissions(object):
 
                 ability_prefix, ability_suffix = desired_ability.rsplit(".", 1)
                 if current_user:
-                    print(current_user.abilities, ability_suffix, ability_prefix)
                     if current_user.has_ability(desired_ability):
                         return func(*args, **kwargs)
 

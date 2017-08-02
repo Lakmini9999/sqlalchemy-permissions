@@ -9,88 +9,105 @@ It also plays nicely with [Flask-SQLAlchemy](https://github.com/mitsuhiko/flask-
 
 Installs quickly and easily using PIP:
 
-    pip install SQLAlchemy-Permissions
+```bash
+pip install SQLAlchemy-Permissions
+```
 
 ## Getting Started
 
 1. Import Flask, Flask-SQLAlchemy, and, if you want, Flask-Login.
 
-        from flask import Flask
-        from flask.ext.login import LoginManager, current_user
-        from flask.ext.sqlalchemy import SQLAlchemy
+```python
+from flask import Flask
+from flask_login import LoginManager, current_user
+from flask_sqlalchemy import SQLAlchemy
+```
 
 2. Import the `Permissions` object.
 
-        from sqlalchemy_permissions import Permissions
+```python
+from sqlalchemy_permissions import Permissions
+```
 
 3. Instantiate the `Permissions` object passing in your User and Role classes, and a proxy for the current user.
 
-        perms = Permissions(User, Role, current_user)
+```python
+perms = Permissions(User, Role, current_user)
+```
 
-4. Sub-class the SQLAlchemy-Permissions UserMixin and RoleMixin. Call the Mixins' `__init__` in your own `__init__`.
+4. Sub-class the SQLAlchemy-Permissions UserMixin and RoleMixin.
+Call the Mixins' `__init__` in your own `__init__`.
+Don't forget to add a `__roleclass__` attribute to your User class.
 
-        from app import db
-        from sqlalchemy_permissions.models import UserMixin, RoleMixin
-
-
-        class Role(RoleMixin, db.Model):
-            id = Column(Integer, primary_key=True)
-            # Add whatever fields you need for your user class here.
-
-            def __init__(self, ...):
-                # Do your user init
-                RoleMixin.__init__(self, roles)
+```python
+from app import db
+from sqlalchemy_permissions.models import UserMixin, RoleMixin
 
 
-        class User(UserMixin, db.Model):
-            __roleclass__ = Role
+class Role(RoleMixin, db.Model):
+    id = Column(Integer, primary_key=True)
+    # Add whatever fields you need for your user class here.
 
-            id = Column(Integer, primary_key=True)
-            # Add whatever fields you need for your user class here.
+    def __init__(self, ...):
+        # Do your user init
+        RoleMixin.__init__(self, roles)
 
-            def __init__(self, ...):
-                # Do your user init
-                UserMixin.__init__(self, roles)
+
+class User(UserMixin, db.Model):
+    # REQUIRED
+    __roleclass__ = Role
+
+    id = Column(Integer, primary_key=True)
+    # Add whatever fields you need for your user class here.
+
+    def __init__(self, ...):
+        # Do your user init
+        UserMixin.__init__(self, roles)
+```
 
 5. Add roles to your users and abilities to your roles. This can be done using convenience methods on the `UserMixin` and `RoleMixin` classes.
 
-    You'll need a role to start adding abilities.
+You'll need a role to start adding abilities.
 
-        my_role = Role('admin')
+```python
+my_role = Role("admin")
+```
 
-    Add abilities by passing string ability names to `role.add_abilities()`. Add the role to the session and commit when you're done.
+Add abilities by passing string ability names to `role.add_abilities()`. Add the role to the session and commit when you're done.
 
-        my_role.add_abilities('create_users', 'delete_users', 'bring_about_world_peace')
-        db.session.add(my_role)
-        db.session.commit()
+```python
+my_role.add_abilities("create_users", "delete_users", "bring_about_world_peace")
+db.session.add(my_role)
+db.session.commit()
+```
 
-    Add roles on an instance of your `UserMixin` sub-class.
+Add roles on an instance of your `UserMixin` sub-class.
 
-        my_user = User()
+    my_user = User()
 
-    The `user.add_roles()` expects Role objects that will be assigned to the user. Don't forget to add and commit to the database!
+The `user.add_roles()` expects Role objects that will be assigned to the user. Don't forget to add and commit to the database!
 
-        my_user.add_roles([my_role])
-        db.session.add(my_user)
-        db.session.commit()
+    my_user.add_roles([my_role])
+    db.session.add(my_user)
+    db.session.commit()
 
-    Similarly to the add methods, the classes also offer remove methods that work in the same way. Pass strings to `role.remove_abilities()` or roles to `user.remove_roles()` to remove those attributes from the objects in question.
+Similarly to the add methods, the classes also offer remove methods that work in the same way. Pass strings to `role.remove_abilities()` or roles to `user.remove_roles()` to remove those attributes from the objects in question.
 
 6. Put those decorators to work! Decorate any of your views with the `user_is` or `user_has` decorators from the `Permissions` instance to limit access.
 
-    `@user_is` decorator:
+`@user_is` decorator:
 
-        @app.route('/admin', methods=['GET', 'POST'])
-        @perms.user_is('admin')
-        def admin():
-            return render_template('admin.html')
+    @app.route('/admin', methods=['GET', 'POST'])
+    @perms.user_is('admin')
+    def admin():
+        return render_template('admin.html')
 
-    `@user_has` decorator:
+`@user_has` decorator:
 
-        @app.route('/delete-users', methods=['GET', 'POST'])
-        @perms.user_has('delete_users')
-        def delete_users():
-            return render_template('delete-users.html')
+    @app.route('/delete-users', methods=['GET', 'POST'])
+    @perms.user_has('delete_users')
+    def delete_users():
+        return render_template('delete-users.html')
 
 ## Example Implementation
 
