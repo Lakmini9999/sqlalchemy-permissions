@@ -1,6 +1,6 @@
 # SQLAlchemy-Permissions
 
-[![Build Status](https://travis-ci.org/louistrezzini/sqlalchemy-permissions.png?branch=master)](https://travis-ci.org/louistrezzini/sqlalchemy-permissions)
+[![Build Status](https://travis-ci.org/LouisTrezzini/sqlalchemy-permissions.png?branch=master)](https://travis-ci.org/LouisTrezzini/sqlalchemy-permissions)
 
 SQLAlchemy-Permissions is a simple Flask permissions extension that works with [SQLAlchemy](https://github.com/zzzeek/sqlalchemy).
 It also plays nicely with [Flask-SQLAlchemy](https://github.com/mitsuhiko/flask-sqlalchemy) and [Flask-Login](https://github.com/maxcountryman/flask-login) although they're not a requirement.
