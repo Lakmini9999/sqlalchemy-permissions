@@ -12,17 +12,17 @@ class AbilitiesMixin:
 
     @property
     def abilities(self):
-        return set(self.abilities_text.split("\n"))
+        return set(filter(None, self.abilities_text.split("\n")))
 
     @abilities.setter
     def abilities(self, new_abilities):
         self.abilities_text = "\n".join(set(new_abilities))
 
     def add_abilities(self, new_abilities):
-        self.abilities.update(new_abilities)
+        self.abilities = self.abilities.union(new_abilities)
 
     def remove_abilities(self, old_abilities):
-        self.abilities.difference_update(old_abilities)
+        self.abilities = self.abilities.difference(old_abilities)
 
     def has_ability(self, ability):
         if ability in self.abilities:
