@@ -59,7 +59,7 @@ class UserMixin(AbilitiesMixin):
     @declared_attr
     def roles(self):
         users_roles_table = Table(
-            "user_roles",
+            "%s_%s" % (self.__tablename__, self.__roleclass__.__tablename__),
             self.metadata,
             Column("id", Integer, primary_key=True),
             Column("user_id", Integer, ForeignKey("%s.id" % self.__tablename__), nullable=False),
