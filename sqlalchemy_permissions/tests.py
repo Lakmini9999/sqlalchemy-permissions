@@ -259,6 +259,19 @@ class PermissionsTests(DatabaseTests):
         wrapped_function = perms.user_is("admin")(self.mock_function)
         self.assertRaises(Forbidden, wrapped_function)
 
+    def test_check_user_has_pass(self):
+        self.assertEqual(perms.check_user_has("user.list"), None)
+
+    def test_check_user_has_fail(self):
+        with self.assertRaises(Forbidden):
+            perms.check_user_has("user.update")
+
+    def test_check_user_has_self(self):
+        with self.assertRaises(Forbidden):
+            perms.check_user_has("user.update.7", 7)
+
+        self.assertEqual(perms.check_user_has("user.update.1", 1), None)
+
 
 if __name__ == "__main__":  # optional, but makes import and reuse easier
     unittest.main()
