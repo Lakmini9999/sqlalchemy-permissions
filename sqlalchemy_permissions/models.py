@@ -3,11 +3,11 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declared_attr
 
 
-class AbilitiesMixin:
+class AbilitiesMixin(object):
     abilities_text = Column(Text())
 
     def __init__(self):
-        super().__init__()
+        super(AbilitiesMixin, self).__init__()
         self.abilities_text = ""
 
     @property
@@ -44,7 +44,7 @@ class RoleMixin(AbilitiesMixin):
     name = Column(String(120), unique=True, nullable=False)
 
     def __init__(self, name=None):
-        super().__init__()
+        super(RoleMixin, self).__init__()
         if name:
             self.name = name.lower()
 
@@ -69,7 +69,7 @@ class UserMixin(AbilitiesMixin):
         return relationship("Role", secondary=users_roles_table, backref="users")
 
     def __init__(self, roles=None):
-        super().__init__()
+        super(UserMixin, self).__init__()
         # If only a string is passed for roles, convert it to a list containing
         # that string
         if roles and isinstance(roles, RoleMixin):
@@ -103,7 +103,7 @@ class UserMixin(AbilitiesMixin):
 
     @AbilitiesMixin.abilities.getter
     def abilities(self):
-        user_abilities = super().abilities
+        user_abilities = super(UserMixin, self).abilities
 
         for role in self.roles:
             user_abilities.update(role.abilities)

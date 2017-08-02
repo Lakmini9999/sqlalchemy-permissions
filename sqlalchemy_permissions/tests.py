@@ -233,7 +233,7 @@ class PermissionsTests(DatabaseTests):
         db.session.commit()
 
     def setUp(self):
-        super().setUp()
+        super(PermissionsTests, self).setUp()
         self.create_user()
 
     def test_user_has_pass(self):

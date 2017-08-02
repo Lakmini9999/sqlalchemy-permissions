@@ -2,7 +2,7 @@ from functools import wraps
 from werkzeug.exceptions import Forbidden
 
 
-class Permissions:
+class Permissions(object):
     def __init__(self, user_class, role_class, user_getter=None):
         self.__user_class = user_class
         self.__role_class = role_class
