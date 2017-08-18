@@ -99,7 +99,7 @@ class UserMixin(AbilitiesMixin):
         for role in roles:
             if isinstance(role, RoleMixin):
                 if role not in self.roles:
-                    self.roles.extend(role)
+                    self.roles.append(role)
                 #TODO: Option to add role by role name
 
         self.roles.extend([role for role in roles if role not in self.roles])
