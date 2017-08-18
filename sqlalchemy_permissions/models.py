@@ -96,6 +96,12 @@ class UserMixin(AbilitiesMixin):
         if not isinstance(roles, (list, tuple)):
             raise ValueError("Invalid roles")
 
+        for role in roles:
+            if isinstance(role, RoleMixin):
+                if role not in self.roles:
+                    self.roles.extend(role)
+                #TODO: Option to add role by role name
+
         self.roles.extend([role for role in roles if role not in self.roles])
 
     def remove_roles(self, roles):
@@ -108,7 +114,7 @@ class UserMixin(AbilitiesMixin):
         if isinstance(role, RoleMixin):
             return role in self.roles
         elif isinstance(role, str):
-            return next((role_ for role_ in self.roles if role_.name==role), None)
+            return True if next((role_ for role_ in self.roles if role_.name==role), None) else False
 
     @AbilitiesMixin.abilities.getter
     def abilities(self):
