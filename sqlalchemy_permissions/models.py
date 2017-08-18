@@ -18,10 +18,16 @@ class AbilitiesMixin(object):
     def abilities(self, new_abilities):
         self.abilities_text = "\n".join(set(new_abilities))
 
+    def _check_abilities(self, abilities):
+        if not isinstance(abilities, (list, tuple)):
+            raise ValueError('Abilities has to be list or tuple')
+
     def add_abilities(self, new_abilities):
+        self._check_abilities(new_abilities)
         self.abilities = self.abilities.union(new_abilities)
 
     def remove_abilities(self, old_abilities):
+        self._check_abilities(old_abilities)
         self.abilities = self.abilities.difference(old_abilities)
 
     def has_ability(self, ability):
