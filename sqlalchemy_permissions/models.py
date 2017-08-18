@@ -105,7 +105,12 @@ class UserMixin(AbilitiesMixin):
         self.roles = [role for role in self.roles if role not in roles]
 
     def has_role(self, role):
-        return role in self.roles
+        if isinstance(role, RoleMixin):
+            return role in self.roles
+        elif isinstance(role, str):
+            for role_ in self.roles:
+                if role_.name == role:
+                    return role_
 
     @AbilitiesMixin.abilities.getter
     def abilities(self):
