@@ -86,7 +86,7 @@ my_role = Role("admin")
 Add abilities by passing string ability names to `role.add_abilities()`. Add the role to the session and commit when you're done.
 
 ```python
-my_role.add_abilities("create_users", "delete_users", "bring_about_world_peace")
+my_role.add_abilities(["create_users", "delete_users", "bring_about_world_peace"])
 db.session.add(my_role)
 db.session.commit()
 ```

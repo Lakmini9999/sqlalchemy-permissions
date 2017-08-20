@@ -43,6 +43,7 @@ class DatabaseTests(FlaskTestCase):
 
 
 class ModelsTests(DatabaseTests):
+
     def test_user_create_without_roles(self):
         user = User()
         db.session.add(user)
@@ -210,6 +211,11 @@ class ModelsTests(DatabaseTests):
         self.assertFalse(test_role.has_ability("user.create"))
         self.assertTrue(test_role.has_ability("roles"))
         self.assertTrue(test_role.has_ability("roles.delete"))
+
+    def test_ability_type(self):
+        role = Role('example')
+        with self.assertRaises(ValueError):
+            role.add_abilities('new_ability')
 
 
 perms = Permissions(User, Role, user_getter=lambda: User.query.get(1))

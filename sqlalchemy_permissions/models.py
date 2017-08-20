@@ -18,10 +18,16 @@ class AbilitiesMixin(object):
     def abilities(self, new_abilities):
         self.abilities_text = "\n".join(set(new_abilities))
 
+    def _check_abilities(self, abilities):
+        if not isinstance(abilities, (list, tuple)):
+            raise ValueError('Abilities has to be list or tuple')
+
     def add_abilities(self, new_abilities):
+        self._check_abilities(new_abilities)
         self.abilities = self.abilities.union(new_abilities)
 
     def remove_abilities(self, old_abilities):
+        self._check_abilities(old_abilities)
         self.abilities = self.abilities.difference(old_abilities)
 
     def has_ability(self, ability):
@@ -90,6 +96,12 @@ class UserMixin(AbilitiesMixin):
         if not isinstance(roles, (list, tuple)):
             raise ValueError("Invalid roles")
 
+        for role in roles:
+            if isinstance(role, RoleMixin):
+                if role not in self.roles:
+                    self.roles.append(role)
+                #TODO: Option to add role by role name
+
         self.roles.extend([role for role in roles if role not in self.roles])
 
     def remove_roles(self, roles):
@@ -99,7 +111,10 @@ class UserMixin(AbilitiesMixin):
         self.roles = [role for role in self.roles if role not in roles]
 
     def has_role(self, role):
-        return role in self.roles
+        if isinstance(role, RoleMixin):
+            return role in self.roles
+        elif isinstance(role, str):
+            return True if next((role_ for role_ in self.roles if role_.name==role), None) else False
 
     @AbilitiesMixin.abilities.getter
     def abilities(self):
